@@ -41,6 +41,7 @@ class GpsPoller(threading.Thread):
 
 line = []
 coords=""
+prevstr=""
 
 gpsp = GpsPoller() # create the thread
 try:
@@ -48,19 +49,23 @@ try:
     while True:
         for c in ser.read():
             line.append(c)
-            f = open('report.txt','a')
+            f = open('/opt/report.txt','a')
             if c == '\n':
-                #read temp
-                humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.AM2302, '4')
-                TEMP='Temp={0:0.1f} | Humidity={1:0.1f}% | '.format(temperature, humidity)
-                #read timestamp
-                dateTimeObj = datetime.now()
-                timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
-                #prepare line
-                data=timestampStr + ' | ' + "Lat:" + str(gpsd.fix.latitude) + " " + "Long:" + str(gpsd.fix.longitude) + ' | ' + TEMP + str(''.join(line))
-                print(data)
-                f.write(data)
-                line = []
+                curstr=str(''.join(line))
+                if prevstr != curstr:
+                    f = open('/opt/report.txt','a')
+                    #read temp
+                    humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.AM2302, '4')
+                    TEMP='Temp={0:0.1f} | Humidity={1:0.1f}% | '.format(temperature, humidity)
+                    #read timestamp
+                    dateTimeObj = datetime.now()
+                    timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+                    #prepare line
+                    data=timestampStr + ' | ' + "Lat:" + str(gpsd.fix.latitude) + " " + "Long:" + str(gpsd.fix.longitude) + ' | ' + TEMP + str(''.join(line))
+                    print(data)
+                    f.write(data)
+                    line = []
+                    break
                 break
 except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print "\nKilling Thread..."
