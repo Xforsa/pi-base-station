@@ -61,9 +61,10 @@ try:
                     dateTimeObj = datetime.now()
                     timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
                     #prepare line
-                    data=timestampStr + ' | ' + "Lat:" + str(gpsd.fix.latitude) + " " + "Long:" + str(gpsd.fix.longitude) + ' | ' + TEMP + str(''.join(line))
+                    data=timestampStr + ' | ' + "Lat:" + str(gpsd.fix.latitude) + " " + "Long:" + str(gpsd.fix.longitude) + ' | ' + TEMP + curstr
                     print(data)
                     f.write(data)
+                    prevstr = curstr
                     line = []
                     break
                 break
