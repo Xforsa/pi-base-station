@@ -42,6 +42,7 @@ class GpsPoller(threading.Thread):
 line = []
 coords=""
 prevstr=""
+curstr=""
 
 gpsp = GpsPoller() # create the thread
 try:
@@ -49,24 +50,25 @@ try:
     while True:
         for c in ser.read():
             line.append(c)
-            f = open('/opt/report.txt','a')
             if c == '\n':
+                curstr=""
                 curstr=str(''.join(line))
                 if prevstr != curstr:
                     f = open('/opt/report.txt','a')
                     #read temp
                     humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.AM2302, '4')
-                    TEMP='Temp={0:0.1f} | Humidity={1:0.1f}% | '.format(temperature, humidity)
+                    TEMP='T={0:0.1f} | H={1:0.1f}% | '.format(temperature, humidity)
                     #read timestamp
                     dateTimeObj = datetime.now()
                     timestampStr = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
                     #prepare line
-                    data=timestampStr + ' | ' + "Lat:" + str(gpsd.fix.latitude) + " " + "Long:" + str(gpsd.fix.longitude) + ' | ' + TEMP + curstr
-                    print(data)
+                    data=timestampStr + ' | ' + "Lat:" + str(gpsd.fix.latitude) + " " + "Lng:" + str(gpsd.fix.longitude) + ' | ' + TEMP + str(''.join(line))
                     f.write(data)
-                    prevstr = curstr
                     line = []
-                    break
+                    prevstr=curstr
+                    curstr=""
+                else:
+                    line = []
                 break
 except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print "\nKilling Thread..."
