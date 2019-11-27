@@ -44,6 +44,10 @@ coords=""
 prevstr=""
 curstr=""
 
+# clear report file
+f = open('/opt/report.txt', 'w')
+f.close()
+
 gpsp = GpsPoller() # create the thread
 try:
     gpsp.start() # start it up
